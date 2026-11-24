@@ -23,11 +23,11 @@ Settings are in `config.yml`. These environment variables win over it: `SHOP_HOS
 
 ## Practice on your lab server (Session 1)
 
-Run these from your laptop, in the folder holding your team key and the unzipped `shopnow`
-folder. Replace `07` with your team number.
+Run these from your laptop, in the folder holding your key (`student07.key`) and the unzipped `shopnow`
+folder. Replace `07` with your server number.
 
 1. **Upload it** (scp takes a capital `-P` for the port):
-   `scp -P 2207 -i team07.key -r shopnow lab@session1.nateg-issatso.live:~`
+   `scp -P 2207 -i student07.key -r shopnow lab@session1.nateg-issatso.live:~`
 2. **Run it** on the server: `cd shopnow && python3 app.py &`, then `curl http://127.0.0.1:8000/health`.
 3. **Read its log**: each `curl` prints a line in the terminal where the app runs.
 4. **Break the permissions**: `chmod 000 config.yml`, restart the app, read the error, and fix it
