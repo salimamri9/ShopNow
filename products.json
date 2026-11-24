@@ -1,0 +1,8 @@
+[
+  {"id": 1, "name": "Mechanical keyboard", "description": "Clicky, loud, makes you type faster (it doesn't).", "price": 189, "emoji": "⌨️"},
+  {"id": 2, "name": "Rubber duck", "description": "Explain your bug to it. Works every time.", "price": 12, "emoji": "🦆"},
+  {"id": 3, "name": "Coffee mug", "description": "Says 'It works on my machine'.", "price": 25, "emoji": "☕"},
+  {"id": 4, "name": "Penguin plush", "description": "Tux, the Linux mascot. Soft, open source.", "price": 45, "emoji": "🐧"},
+  {"id": 5, "name": "Ethernet cable, 5 m", "description": "For when the Wi-Fi gives up.", "price": 15, "emoji": "🔌"},
+  {"id": 6, "name": "Server rack sticker", "description": "Make your laptop look like a data center.", "price": 5, "emoji": "🗄️"}
+]

@@ -1,0 +1,16 @@
+# /etc/systemd/system/shop.service
+# Install: sudo cp deploy/shop.service /etc/systemd/system/
+#          sudo systemctl daemon-reload && sudo systemctl enable --now shop
+[Unit]
+Description=ShopNow online shop
+After=network.target
+
+[Service]
+User=sara
+WorkingDirectory=/opt/shop
+ExecStart=/usr/bin/python3 /opt/shop/app.py
+Environment=SHOP_ENV=production
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

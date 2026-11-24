@@ -1,0 +1,7 @@
+# ShopNow settings. Environment variables (SHOP_HOST, SHOP_PORT, SHOP_ENV) win over these.
+shop_name: ShopNow
+currency: TND
+host: 127.0.0.1
+port: 8000
+env: development
+products_file: products.json
