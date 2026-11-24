@@ -1,6 +1,6 @@
 # ShopNow
 
-The online shop Sara puts online in the Cloud & DevOps sessions. It's one Python file with
+The online shop l3ou9 puts online in the Cloud & DevOps sessions. It's one Python file with
 nothing to install, so it runs on any Linux server, including your lab server.
 
 ```bash
@@ -23,7 +23,7 @@ Settings are in `config.yml`. These environment variables win over it: `SHOP_HOS
 
 ## Deploy it on your practice server (Session 1)
 
-The slides walk through this with Sara. Run step 1 on your laptop, in the folder holding your
+The slides walk through this with l3ou9. Run step 1 on your laptop, in the folder holding your
 key (`student07.key`) and `shopnow.zip` (from the session site), and the rest on the server
 (`ssh -i student07.key l3ou9@session1.nateg-issatso.live -p 2307`). Replace `07` with your number.
 
