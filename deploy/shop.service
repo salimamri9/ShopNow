@@ -6,7 +6,7 @@ Description=ShopNow online shop
 After=network.target
 
 [Service]
-User=sara
+User=l3ou9
 WorkingDirectory=/opt/shop
 ExecStart=/usr/bin/python3 /opt/shop/app.py
 Environment=SHOP_ENV=production

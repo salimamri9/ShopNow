@@ -25,14 +25,14 @@ Settings are in `config.yml`. These environment variables win over it: `SHOP_HOS
 
 The slides walk through this with Sara. Run step 1 on your laptop, in the folder holding your
 key (`student07.key`) and `shopnow.zip` (from the session site), and the rest on the server
-(`ssh -i student07.key sara@session1.nateg-issatso.live -p 2307`). Replace `07` with your number.
+(`ssh -i student07.key l3ou9@session1.nateg-issatso.live -p 2307`). Replace `07` with your number.
 
-1. **Upload it:** `scp -P 2307 -i student07.key shopnow.zip sara@session1.nateg-issatso.live:~`
+1. **Upload it:** `scp -P 2307 -i student07.key shopnow.zip l3ou9@session1.nateg-issatso.live:~`
    (scp takes a capital `-P` for the port), then on the server `unzip shopnow.zip`.
 2. **Put it in place:** `sudo cp -r ~/shopnow /opt/shop`, then lock the config, which holds
    secrets: `sudo chmod 600 /opt/shop/config.yml`.
 3. **Run it:** `python3 /opt/shop/app.py` fails with `PermissionError`. `ls -l` shows why;
-   `sudo chown -R sara /opt/shop` fixes it.
+   `sudo chown -R l3ou9 /opt/shop` fixes it.
 4. **Keep it running:** `sudo cp /opt/shop/deploy/shop.service /etc/systemd/system/`,
    `sudo systemctl daemon-reload`, `sudo systemctl enable --now shop`,
    then `curl 127.0.0.1:8000/health` and `journalctl -u shop -n 5`.
