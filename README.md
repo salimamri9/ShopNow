@@ -21,22 +21,30 @@ Settings are in `config.yml`. These environment variables win over it: `SHOP_HOS
 `deploy/` holds the files from the slides: `shop.service` (systemd), `nginx-shop.conf`
 (reverse proxy) and `deploy.sh`. Tests: `python3 -m unittest discover tests`.
 
-## Practice on your lab server (Session 1)
+## Deploy it on your practice server (Session 1)
 
-Run these from your laptop, in the folder holding your key (`student07.key`) and the unzipped `shopnow`
-folder. Replace `07` with your server number.
+The slides walk through this with Sara. Run step 1 on your laptop, in the folder holding your
+key (`student07.key`) and `shopnow.zip` (from the session site), and the rest on the server
+(`ssh -i student07.key sara@session1.nateg-issatso.live -p 2307`). Replace `07` with your number.
 
-1. **Upload it** (scp takes a capital `-P` for the port):
-   `scp -P 2207 -i student07.key -r shopnow lab@session1.nateg-issatso.live:~`
-2. **Run it** on the server: `cd shopnow && python3 app.py &`, then `curl http://127.0.0.1:8000/health`.
-3. **Read its log**: each `curl` prints a line in the terminal where the app runs.
-4. **Break the permissions**: `chmod 000 config.yml`, restart the app, read the error, and fix it
-   with `chmod 600 config.yml`.
-5. **Change an environment variable**: `SHOP_ENV=production python3 app.py &`, then
-   `curl -s http://127.0.0.1:8000/ | grep mode`. The banner is gone.
-6. **Stop it**: `kill %1`, or find its PID with `pgrep -f app.py` and `kill` it.
-7. **Log out and back in**: an app started with `&` dies with your session. That's why
-   `deploy/shop.service` exists.
+1. **Upload it:** `scp -P 2307 -i student07.key shopnow.zip sara@session1.nateg-issatso.live:~`
+   (scp takes a capital `-P` for the port), then on the server `unzip shopnow.zip`.
+2. **Put it in place:** `sudo cp -r ~/shopnow /opt/shop`, then lock the config, which holds
+   secrets: `sudo chmod 600 /opt/shop/config.yml`.
+3. **Run it:** `python3 /opt/shop/app.py` fails with `PermissionError`. `ls -l` shows why;
+   `sudo chown -R sara /opt/shop` fixes it.
+4. **Keep it running:** `sudo cp /opt/shop/deploy/shop.service /etc/systemd/system/`,
+   `sudo systemctl daemon-reload`, `sudo systemctl enable --now shop`,
+   then `curl 127.0.0.1:8000/health` and `journalctl -u shop -n 5`.
+5. **Put nginx in front** (`sudo apt install -y nginx` first):
+   ```bash
+   sudo cp /opt/shop/deploy/nginx-shop.conf /etc/nginx/sites-available/shop
+   sudo ln -s ../sites-available/shop /etc/nginx/sites-enabled/
+   sudo rm /etc/nginx/sites-enabled/default
+   sudo nginx -t && sudo systemctl reload nginx
+   ```
+   Open `http://session1.nateg-issatso.live:2407`: that's your shop, on the internet.
+6. **Redeploy:** `/opt/shop/deploy/deploy.sh` restarts it and checks `/health`.
 
 ## Later sessions
 
