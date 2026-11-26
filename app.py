@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ShopNow: the small online shop l3ou9 deploys in the Cloud & DevOps sessions.
+"""ShopNow: the small online shop students deploy in the Cloud & DevOps sessions.
 
 Plain Python 3, no packages to install. Settings come from config.yml and can be
 overridden with environment variables:

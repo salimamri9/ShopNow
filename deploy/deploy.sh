@@ -1,5 +1,5 @@
 #!/bin/bash
-# l3ou9's deploy script (Session 1, "Never type it twice").
+# The student's deploy script (Session 1, "Never type it twice").
 set -e   # stop at the first error
 
 echo "Restarting the shop..."
