@@ -51,3 +51,27 @@ key (`student07.key`) and `shopnow.zip` (from the session site), and the rest on
 - **Session 2:** put it in a Docker image (`SHOP_HOST=0.0.0.0` inside a container).
 - **Session 3:** run it on a cloud VM behind nginx.
 - **Session 4:** run the tests and the deploy in a CI/CD pipeline.
+
+## Pages
+
+`/` shop (filter with `?category=`, search with `?q=`) · `/product/<id>` · `/cart` (kept in the browser) ·
+`/checkout` (demo: the order only goes to the log, nothing is charged or shipped) · `/health` · `/api/products`.
+
+## Photo credits
+
+Product photos from Wikimedia Commons, cropped and resized (`static/img/`):
+
+| File | Author | License |
+|---|---|---|
+| keyboard.jpg | Stan Lee | CC BY-SA 4.0 |
+| mouse.jpg | Pixloom | CC BY-SA 4.0 |
+| headphones.jpg | KrypteriaIV | CC BY-SA 3.0 |
+| webcam.jpg | Zsinytwiki | CC0 |
+| monitor.jpg | Zzubnik | Public domain |
+| usbc-hub.jpg | Khalid Bencherifa | CC BY-SA 4.0 |
+| raspberrypi.jpg | Laserlicht | CC BY-SA 4.0 |
+| cable.jpg | Khairil Yusof | CC BY 2.0 |
+| duck.jpg | RandomPerson238 | CC BY-SA 4.0 |
+| penguin.jpg | Kowalski7cc | CC0 |
+| stickers.jpg | Mind Booster Noori | CC0 |
+| coffee.jpg | Janko Ferlic | CC0 |
