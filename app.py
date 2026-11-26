@@ -115,6 +115,8 @@ form.co{display:grid;gap:14px;max-width:520px}
 form.co label{font-size:14px;font-weight:600;display:grid;gap:6px}
 form.co input,form.co select{padding:11px 12px;border:1px solid #d5d9df;border-radius:8px;font-size:15px}
 .ok{font-size:48px}
+.rev{margin:20px 0 0;padding:16px 18px;background:#f6f7f9;border-left:4px solid #ff7a1a;border-radius:8px;font-size:16px;font-style:italic}
+.rev span{display:block;margin-top:6px;font-style:normal;font-size:13px;color:#6b7280}
 .muted{color:#6b7280}
 footer{background:#12161c;color:#9aa1ab;font-size:13px;padding:24px 0}
 footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
@@ -130,7 +132,7 @@ const KEY='shopnow-cart';
 const cart=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return {}}};
 const save=c=>{localStorage.setItem(KEY,JSON.stringify(c));badge()};
 function badge(){const n=Object.values(cart()).reduce((a,b)=>a+b,0);document.querySelectorAll('.badge').forEach(b=>b.textContent=n)}
-function add(id){const c=cart();c[id]=(c[id]||0)+1;save(c);toast('Added to cart')}
+function add(id){const c=cart();c[id]=(c[id]||0)+1;save(c);toast('Added to cart · HTTP 201 Created')}
 function setq(id,d){const c=cart();c[id]=(c[id]||0)+d;if(c[id]<=0)delete c[id];save(c);if(window.renderCart)renderCart()}
 function toast(t){const e=document.querySelector('.toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1400)}
 document.addEventListener('DOMContentLoaded',badge);
@@ -168,12 +170,12 @@ def layout(settings, title, body, active=""):
 {ribbon}
 <header class="top"><div class="wrap">
 <a class="logo" href="/">{logo}</a>
-<form class="search" action="/"><input name="q" placeholder="Search keyboards, cables, rubber ducks…"><button>Search</button></form>
+<form class="search" action="/"><input name="q" placeholder="grep -i &quot;rubber duck&quot; ./shop"><button>Search</button></form>
 <a class="cartlink" href="/cart">Cart <span class="badge">0</span></a>
 </div></header>
 <nav class="cats"><div class="wrap">{cats}</div></nav>
 <main class="wrap">{body}</main>
-<footer><div class="wrap"><span>© {name} · served by {hostname} · env={env}</span>
+<footer><div class="wrap"><span>© {name} · served by {hostname} · env={env} · no cookies were harmed (we use localStorage)</span>
 <span><a href="/health">/health</a> · <a href="/api/products">/api/products</a></span></div></footer>
 <div class="toast"></div>
 <script>{js}</script>
@@ -208,30 +210,36 @@ def render_home(settings, products, category="", query=""):
              if (not category or p.get("category") == category)
              and (not query or query.lower() in (p["name"] + " " + p.get("description", "")).lower())]
     if query:
-        heading = 'Results for “{}”'.format(esc(query))
+        heading = 'grep results for “{}”'.format(esc(query))
     elif category:
         heading = esc(category)
     else:
-        heading = "Popular right now"
+        heading = "Trending on localhost"
     hero = "" if (category or query) else """<section class="hero"><div><h1>Gear for people who ship.</h1>
-<p>Keyboards, screens, cables and rubber ducks. Delivered anywhere in Tunisia.</p></div>
-<div class="code">CODE: DEPLOY10 · -10%</div></section>
-<div class="perks"><div class="perk"><b>Free delivery</b>on orders over 150 {c}</div>
-<div class="perk"><b>Pay on delivery</b>cash or card at your door</div>
-<div class="perk"><b>30-day returns</b>no questions asked</div></div>""".format(c=esc(settings["currency"]))
-    grid = "".join(card(p, settings) for p in shown) or '<p class="muted">Nothing found.</p>'
+<p>Keyboards, cables and rubber ducks. Delivered anywhere in Tunisia with 99.9% uptime<br>(the other 0.1% was DNS).</p></div>
+<div class="code">COUPON: sudo-10 · -10%</div></section>
+<div class="perks"><div class="perk"><b>Free delivery</b>over 150 {c}. Faster than your CI pipeline.</div>
+<div class="perk"><b>Pay on delivery</b>like a lazy-loaded promise: resolved at your door</div>
+<div class="perk"><b>30-day returns</b>git revert, but for things you bought</div></div>""".format(c=esc(settings["currency"]))
+    grid = "".join(card(p, settings) for p in shown) or (
+        '<p class="muted">404: no products found. Have you tried turning the search off and on again?</p>')
     body = '{hero}<h2 class="sec">{h}</h2><div class="grid">{grid}</div>'.format(hero=hero, h=heading, grid=grid)
     return layout(settings, settings["name"], body, active=category)
 
 
 def render_product(settings, p):
     old = " <s>{}</s>".format(esc(money(p["old_price"], settings))) if p.get("old_price") else ""
+    review = ""
+    if p.get("review"):
+        review = ('<blockquote class="rev">“{}”<span>{} · verified {}</span></blockquote>'
+                  .format(esc(p["review"][0]), stars(p.get("rating", 5)), esc(p["review"][1])))
     stock = p.get("stock", 1)
     if stock == 0:
-        stock_html, button = '<div class="stock none">Sold out</div>', '<button class="btn big" disabled>Sold out</button>'
+        stock_html, button = ('<div class="stock none">Sold out · 503 Service Unavailable</div>',
+                              '<button class="btn big" disabled>Sold out</button>')
     else:
-        stock_html = ('<div class="stock low">Only {} left</div>'.format(stock) if stock < 10
-                      else '<div class="stock">In stock</div>')
+        stock_html = ('<div class="stock low">Only {} left: race condition imminent</div>'.format(stock) if stock < 10
+                      else '<div class="stock">In stock (eventually consistent)</div>')
         button = '<button class="btn big" onclick="add({})">Add to cart</button>'.format(int(p["id"]))
     body = """<div class="crumbs"><a href="/">Home</a> › <a href="/?category={qc}">{cat}</a> › {name}</div>
 <div class="detail"><img src="/static/img/{img}" alt="{name}">
@@ -240,7 +248,7 @@ def render_product(settings, p):
 <div class="price">{price}{old}</div>{stock}
 <p style="font-size:17px;line-height:1.55">{desc}</p>{button}
 <p class="muted" style="font-size:14px;margin-top:18px">Free delivery over 150 {c} · Pay on delivery · 30-day returns</p>
-</div></div>""".format(
+{review}</div></div>""".format(review=review,
         qc=urllib.parse.quote(p.get("category", "")), cat=esc(p.get("category", "")), name=esc(p["name"]),
         img=esc(p.get("image", "")), stars=stars(p.get("rating", 0)), rating=esc(p.get("rating", "")),
         reviews=esc(p.get("reviews", 0)), price=esc(money(p["price"], settings)), old=old, stock=stock_html,
@@ -259,7 +267,7 @@ const P={data}, CUR={cur};
 function renderCart(){{const c=cart(),ids=Object.keys(c).filter(i=>P[i]);let t=0;
 document.getElementById('lines').innerHTML=ids.length?ids.map(i=>{{t+=P[i].price*c[i];
 return `<div class="line"><img src="/static/img/${{P[i].image}}" alt=""><div class="grow"><b>${{P[i].name}}</b><div class="muted">${{P[i].price}} ${{CUR}}</div></div>
-<div class="qty"><button onclick="setq(${{i}},-1)">−</button>${{c[i]}}<button onclick="setq(${{i}},1)">+</button></div></div>`}}).join(''):'<p class="muted">Your cart is empty. <a href="/" style="text-decoration:underline">Keep shopping</a></p>';
+<div class="qty"><button onclick="setq(${{i}},-1)">−</button>${{c[i]}}<button onclick="setq(${{i}},1)">+</button></div></div>`}}).join(''):'<p class="muted">Your cart is empty, like /dev/null. <a href="/" style="text-decoration:underline">Keep shopping</a></p>';
 document.getElementById('total').textContent=t+' '+CUR;document.getElementById('go').style.display=ids.length?'':'none'}}
 document.addEventListener('DOMContentLoaded',renderCart);
 </script>""".format(data=data, cur=json.dumps(settings["currency"]))
@@ -267,25 +275,26 @@ document.addEventListener('DOMContentLoaded',renderCart);
 
 
 def render_checkout(settings):
-    body = """<div class="panel"><h2 class="sec">Checkout</h2>
+    body = """<div class="panel"><h2 class="sec">Checkout · almost in production</h2>
 <form class="co" method="post" action="/checkout" onsubmit="document.getElementById('items').value=JSON.stringify(cart())">
 <label>Full name<input name="name" required maxlength="80"></label>
 <label>Phone<input name="phone" required maxlength="20" placeholder="+216 …"></label>
 <label>City<select name="city"><option>Tunis</option><option>Sousse</option><option>Sfax</option><option>Monastir</option><option>Bizerte</option><option>Other</option></select></label>
 <label>Address<input name="address" required maxlength="160"></label>
 <input type="hidden" name="items" id="items">
-<button class="btn big">Place order · pay on delivery</button>
-<p class="muted" style="font-size:13px">Demo shop: no payment is taken and nothing is shipped.</p>
+<button class="btn big">git push origin order · pay on delivery</button>
+<p class="muted" style="font-size:13px">Demo shop: no payment is taken and nothing is shipped. Unlike your code on a Friday.</p>
 </form></div>"""
     return layout(settings, "Checkout · " + settings["name"], body)
 
 
 def render_order(settings, order_id, name):
     body = """<div class="panel" style="text-align:center"><div class="ok">✅</div>
-<h2 class="sec">Thank you, {name}!</h2><p>Order <b>#{oid}</b> is confirmed. You pay on delivery.</p>
+<h2 class="sec">Thank you, {name}!</h2><p>Order <b>#{oid}</b> deployed to production. You pay on delivery.</p>
+<p>ETA: 2–3 business days, or one sprint, whichever slips first.</p>
 <p class="muted">Demo shop: nothing will actually be shipped.</p>
 <p><a href="/"><button class="btn big">Keep shopping</button></a></p></div>
-<script>localStorage.removeItem(KEY);</script>""".format(name=esc(name), oid=esc(order_id))
+<script>localStorage.removeItem("shopnow-cart");</script>""".format(name=esc(name), oid=esc(order_id))
     return layout(settings, "Order confirmed · " + settings["name"], body)
 
 
